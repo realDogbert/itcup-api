@@ -9,13 +9,18 @@ router.get('/', function(req, res, next) {
 /* POST user --> registration */
 router.post('/', (req, res) => {
 
+  console.log(req.body.firstname);
+
   const mailgun = require("mailgun-js");
   const mg = mailgun({
     apiKey: process.env.MAILGUN_APIKEY, 
     domain: process.env.MAILGUN_DOMAIN,
     host: process.env.MAILGUN_HOST});
 
-  var text = 'firstname: ' + req.body.firstname + '\nlastname: ' + req.body.lastname + '\nemail: ' + req.body.email;
+  var text = 'firstname: ' + req.body.firstname 
+    + '\nlastname: ' + req.body.lastname 
+    + '\nemail: ' + req.body.email
+    + '\nagreement: ' + req.body.agreement;
   
   const data = {
     from: 'BMW IT-Cup Registration <postmaster@mg.bmw-itcup.de>',
