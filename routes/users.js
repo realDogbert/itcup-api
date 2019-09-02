@@ -1,39 +1,153 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+const db = require('../dynamoDBManager');
+
+const table = 'golfUsers';
+
+/* Get list of users */
+router.get('/', (req, res) => {
+
+  db.getUsers(req.query.userStatus).then(
+    data => {
+      console.log(data);
+      res.send(data);
+    },
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  ).catch(
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  );
+
+})
+
+
+/* GET a single user */
+router.get('/:id', (req, res) => {
+
+  db.getUser(req.params.id).then(
+    data => {
+      res.send(data.Item);
+    },
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  ).catch(
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  );
+
 });
+
+router.delete('/:id', (req, res) => {
+
+  db.deleteUser(req.params.id).then(
+    data => {
+      res.send(data);
+    },
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  ).catch(
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  );
+
+});
+
+
+router.put('/:id', (req, res) => {
+
+  db.updateUser(req.params.id, req.body).then(
+    data => {
+      res.send(data);
+    },
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  ).catch(
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  )
+
+});
+
 
 /* POST user --> registration */
 router.post('/', (req, res) => {
 
-  console.log(req.body.firstname);
+  db.createUser(req.body).then(
+    data => {
+      res.send(data);
+    },
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  ).catch(
+    error => {
+      console.log(error);
+      res.send(error);
+    }
+  );
 
-  const mailgun = require("mailgun-js");
-  const mg = mailgun({
-    apiKey: process.env.MAILGUN_APIKEY, 
-    domain: process.env.MAILGUN_DOMAIN,
-    host: process.env.MAILGUN_HOST});
+  // var newUser = req.body;
+  // if (!newUser.id) {
+  //   newUser.id = uuidv1();
+  // }
+  // newUser.userName = newUser.lastName + ' ' + newUser.firstName;
+  // newUser.userStatus = 'registered';
 
-  var text = 'firstname: ' + req.body.firstname 
-    + '\nlastname: ' + req.body.lastname 
-    + '\nemail: ' + req.body.email
-    + '\nagreement: ' + req.body.agreement;
+  // docClient.put({ TableName: table, Item: newUser }, function(err, data) {
+  //   if (err) {
+  //     console.log("Error", err);
+  //     res.send(err);
+  //   } else {
+  //     console.log(data);
+  //     res.send(newUser);
+  //   }
+  // })
+
+
+  // const mailgun = require("mailgun-js");
+  // const mg = mailgun({
+  //   apiKey: process.env.MAILGUN_APIKEY, 
+  //   domain: process.env.MAILGUN_DOMAIN,
+  //   host: process.env.MAILGUN_HOST});
+
+  // var text = 'firstname: ' + req.body.firstname 
+  //   + '\nlastname: ' + req.body.lastname 
+  //   + '\nemail: ' + req.body.email
+  //   + '\nagreement: ' + req.body.agreement;
   
-  const data = {
-    from: 'BMW IT-Cup Registration <postmaster@mg.bmw-itcup.de>',
-    to: 'fveitzen@gmail.com',
-    subject: '--> New registration',
-    text: text
-  };
+  // const data = {
+  //   from: 'BMW IT-Cup Registration <postmaster@mg.bmw-itcup.de>',
+  //   to: 'fveitzen@gmail.com',
+  //   subject: '--> New registration',
+  //   text: text
+  // };
 
-  mg.messages().send(data, function (error, body) {
-    console.log(body);
-    res.send(body);
-  });
+  // mg.messages().send(data, function (error, body) {
+  //   console.log(body);
+  //   res.send(body);
+  // });
   
 })
+
+
 
 module.exports = router;
