@@ -3,15 +3,17 @@ var router = express.Router();
 
 const db = require('../dynamoDBManager');
 
-const table = 'golfUsers';
-
 /* Get list of users */
 router.get('/', (req, res) => {
 
   db.getUsers(req.query.userStatus).then(
     data => {
-      console.log(data);
-      res.send(data);
+      if (data.Count < 1) {
+        // no users found
+        res.status(404).send('No data for requested user state found');
+      } else {
+        res.send(data);
+      }
     },
     error => {
       console.log(error);
@@ -19,8 +21,7 @@ router.get('/', (req, res) => {
     }
   ).catch(
     error => {
-      console.log(error);
-      res.send(error);
+      renderError(error);
     }
   );
 
@@ -40,8 +41,7 @@ router.get('/:id', (req, res) => {
     }
   ).catch(
     error => {
-      console.log(error);
-      res.send(error);
+      renderError(error);
     }
   );
 
@@ -59,8 +59,7 @@ router.delete('/:id', (req, res) => {
     }
   ).catch(
     error => {
-      console.log(error);
-      res.send(error);
+      renderError(error);
     }
   );
 
@@ -79,8 +78,7 @@ router.put('/:id', (req, res) => {
     }
   ).catch(
     error => {
-      console.log(error);
-      res.send(error);
+      renderError(error);
     }
   )
 
@@ -100,8 +98,7 @@ router.post('/', (req, res) => {
     }
   ).catch(
     error => {
-      console.log(error);
-      res.send(error);
+      renderError(error);
     }
   );
 
@@ -146,7 +143,12 @@ router.post('/', (req, res) => {
   //   res.send(body);
   // });
   
-})
+});
+
+function renderError(error, res) {
+  console.log(error);
+  res.send(error);
+}
 
 
 
