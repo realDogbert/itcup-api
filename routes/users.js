@@ -33,6 +33,9 @@ router.get('/:id', (req, res) => {
 
   db.getUser(req.params.id).then(
     data => {
+      if (!data.Item) {
+        res.status(404).send('User not found');
+      };
       res.send(data.Item);
     },
     error => {
