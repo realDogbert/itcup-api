@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const db = require('../dynamoDBManager');
+const mail = require('../mailgunManager');
 
 /* Get list of users */
 router.get('/', (req, res) => {
@@ -17,7 +18,7 @@ router.get('/', (req, res) => {
     },
     error => {
       console.log(error);
-      res.send(error);
+      res.status(error.statusCode).send(error.message);
     }
   ).catch(
     error => {
@@ -34,13 +35,14 @@ router.get('/:id', (req, res) => {
   db.getUser(req.params.id).then(
     data => {
       if (!data.Item) {
+        // user not found
         res.status(404).send('User not found');
       };
       res.send(data.Item);
     },
     error => {
       console.log(error);
-      res.send(error);
+      res.status(error.statusCode).send(error.message);
     }
   ).catch(
     error => {
@@ -58,7 +60,7 @@ router.delete('/:id', (req, res) => {
     },
     error => {
       console.log(error);
-      res.send(error);
+      res.status(error.statusCode).send(error.message);
     }
   ).catch(
     error => {
@@ -71,13 +73,14 @@ router.delete('/:id', (req, res) => {
 
 router.put('/:id', (req, res) => {
 
-  db.updateUser(req.params.id, req.body).then(
+  var updatedUser = req.body;
+  db.updateUser(req.params.id, updatedUser).then(
     data => {
-      res.send(data);
+      res.send(updatedUser);
     },
     error => {
       console.log(error);
-      res.send(error);
+      res.status(error.statusCode).send(error.message);
     }
   ).catch(
     error => {
@@ -91,66 +94,26 @@ router.put('/:id', (req, res) => {
 /* POST user --> registration */
 router.post('/', (req, res) => {
 
-  db.createUser(req.body).then(
+  var newUser = req.body;
+  db.createUser(newUser).then(
     data => {
-      res.send(data);
+      mail.sendMail(newUser);
+      res.send(newUser);
     },
     error => {
       console.log(error);
-      res.send(error);
+      res.status(error.statusCode).send(error.message);
     }
   ).catch(
     error => {
       renderError(error);
     }
-  );
-
-  // var newUser = req.body;
-  // if (!newUser.id) {
-  //   newUser.id = uuidv1();
-  // }
-  // newUser.userName = newUser.lastName + ' ' + newUser.firstName;
-  // newUser.userStatus = 'registered';
-
-  // docClient.put({ TableName: table, Item: newUser }, function(err, data) {
-  //   if (err) {
-  //     console.log("Error", err);
-  //     res.send(err);
-  //   } else {
-  //     console.log(data);
-  //     res.send(newUser);
-  //   }
-  // })
-
-
-  // const mailgun = require("mailgun-js");
-  // const mg = mailgun({
-  //   apiKey: process.env.MAILGUN_APIKEY, 
-  //   domain: process.env.MAILGUN_DOMAIN,
-  //   host: process.env.MAILGUN_HOST});
-
-  // var text = 'firstname: ' + req.body.firstname 
-  //   + '\nlastname: ' + req.body.lastname 
-  //   + '\nemail: ' + req.body.email
-  //   + '\nagreement: ' + req.body.agreement;
-  
-  // const data = {
-  //   from: 'BMW IT-Cup Registration <postmaster@mg.bmw-itcup.de>',
-  //   to: 'fveitzen@gmail.com',
-  //   subject: '--> New registration',
-  //   text: text
-  // };
-
-  // mg.messages().send(data, function (error, body) {
-  //   console.log(body);
-  //   res.send(body);
-  // });
-  
+  ); 
 });
 
 function renderError(error, res) {
   console.log(error);
-  res.send(error);
+  res.status(500).send(error);
 }
 
 

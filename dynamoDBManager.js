@@ -59,9 +59,15 @@ createUser = function createUser(newUser) {
       newUser.id = uuidv1();
     }
     newUser.userName = newUser.lastName + ' ' + newUser.firstName;
+    newUser.createdAt = new Date().getTime();
+    newUser.updatedAt = new Date().getTime();
     newUser.userStatus = 'registered';
   
-    return docClient.put({ TableName: table, Item: newUser }).promise();
+    return docClient.put({
+        TableName: table,
+        Item: newUser,
+        ReturnValues: "ALL_OLD"
+    }).promise();
 }
 
 
@@ -70,7 +76,13 @@ updateUser = function updateUser(id, updatedUser) {
     if (!updatedUser.id) {
         updatedUser.id = id;
     }
-    return docClient.put({ TableName: table, Item: updatedUser }).promise();
+    updatedUser.updatedAt = new Date().getTime();
+    
+    return docClient.put({ 
+        TableName: table, 
+        Item: updatedUser, 
+        ReturnValues: "ALL_OLD"  }
+        ).promise();
 
 }
 
