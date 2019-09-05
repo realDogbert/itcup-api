@@ -2,8 +2,7 @@
 var AWS = require('aws-sdk');
 // Set the region 
 AWS.config.update({
-  region: 'eu-central-1',
-  endpoint: "http://localhost:8000"
+  region: 'eu-central-1'
 });
 
 // Create the DynamoDB service object
