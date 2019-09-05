@@ -60,7 +60,9 @@ createUser = function createUser(newUser) {
     newUser.userName = newUser.lastName + ' ' + newUser.firstName;
     newUser.createdAt = new Date().getTime();
     newUser.updatedAt = new Date().getTime();
-    newUser.userStatus = 'registered';
+    if (!newUser.userStatus) {
+        newUser.userStatus = 'registered';
+    }
   
     return docClient.put({
         TableName: table,

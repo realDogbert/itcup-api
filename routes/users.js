@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
         // no users found
         res.status(404).send('No data for requested user state found');
       } else {
-        res.send(data);
+        res.send(data.Items);
       }
     },
     error => {
