@@ -7,6 +7,11 @@ const mail = require('../mailgunManager');
 /* Get list of users */
 router.get('/', (req, res) => {
 
+  // Only allow for local environment, not in public use.
+  if (process.env.ENVIRONMENT != 'LOCAL') {
+    res.status(403).send('Not allowed for public use.');
+  }
+
   db.getUsers(req.query.userStatus).then(
     data => {
       if (data.Count < 1) {
@@ -52,6 +57,7 @@ router.get('/:id', (req, res) => {
 
 });
 
+/* Delete a single user */
 router.delete('/:id', (req, res) => {
 
   db.deleteUser(req.params.id).then(
@@ -70,7 +76,7 @@ router.delete('/:id', (req, res) => {
 
 });
 
-
+/* Update data for a singel user */
 router.put('/:id', (req, res) => {
 
   var updatedUser = req.body;
@@ -91,14 +97,17 @@ router.put('/:id', (req, res) => {
 });
 
 
-/* POST user --> registration */
+/* POST user --> registration
+Save user to dynamoDB and send mail as notification 
+*/
 router.post('/', (req, res) => {
 
   var newUser = req.body;
   db.createUser(newUser).then(
     data => {
       mail.sendMail(newUser);
-      res.send(newUser);
+      // send with https status for CREATED
+      res.status(201).send(newUser);
     },
     error => {
       console.log(error);
@@ -110,6 +119,9 @@ router.post('/', (req, res) => {
     }
   ); 
 });
+
+
+
 
 function renderError(error, res) {
   console.log(error);
