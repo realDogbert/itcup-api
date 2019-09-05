@@ -27,7 +27,8 @@ phases:
 artifacts:
   files:
     - app.js
-    - index.html
+    - dynamoDBManager.js
+    - mailgunManager.js
     - package.json
     - routes/*
     - bin/www
