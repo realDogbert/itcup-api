@@ -2,7 +2,8 @@
 var AWS = require('aws-sdk');
 // Set the region 
 AWS.config.update({
-  region: 'eu-central-1'
+  region: 'eu-central-1',
+//   endpoint: "http://localhost:8000"
 });
 
 // Create the DynamoDB service object
@@ -46,7 +47,6 @@ deleteUser = function deleteUser(id) {
             'id': id
         }
     };
-    console.log(params);
     
     return docClient.delete(params).promise();
 
@@ -78,7 +78,7 @@ updateUser = function updateUser(id, updatedUser) {
         updatedUser.id = id;
     }
     updatedUser.updatedAt = new Date().getTime();
-    
+
     return docClient.put({ 
         TableName: table, 
         Item: updatedUser, 

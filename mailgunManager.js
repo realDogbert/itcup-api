@@ -30,7 +30,26 @@ sendMail = function sendMail(user) {
 
 };
 
-module.exports = { sendMail };
+sendUpdateMail = function sendUpdateMail(user, subject, content) {
+
+    const data = {
+        from: 'BMW IT-Cup Registration <frank@mg.bmw-itcup.de>',
+        to: user.email,
+        subject: subject,
+        text: content
+    };
+
+    mg.messages().send(data, function (error, body) {
+        if (error) {
+            console.log('Error sending update mail: ' + error)
+        } else {
+            console.log('Send Mail to ' + user.userName);
+        }
+    });
+
+}
+
+module.exports = { sendMail, sendUpdateMail };
 
 
 
